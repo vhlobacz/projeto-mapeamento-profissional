@@ -26,37 +26,9 @@ abstract class ControllerTestCase extends TestCase
         unset($_SERVER['REQUEST_URI']);
     }
 
-    /**
-     * @param array<string, mixed> $params
-     */
-    public function get(string $action, string $controllerName, array $params = []): string
+    public function get(string $action, string $controller): string
     {
-        return $this->execController($action, $controllerName, $params);
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     */
-    public function post(string $action, string $controllerName, array $params = []): string
-    {
-        return $this->execController($action, $controllerName, $params);
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     */
-    public function put(string $action, string $controllerName, array $params = []): string
-    {
-        return $this->execController($action, $controllerName, $params);
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     */
-    private function execController(string $action, string $controllerName, array $params = []): string
-    {
-        $controller = $this->getControllerInstance($controllerName);
-        $this->request->addParams($params);
+        $controller = new $controller();
 
         ob_start();
         try {
@@ -67,30 +39,5 @@ abstract class ControllerTestCase extends TestCase
         } finally {
             ob_end_clean();
         }
-    }
-
-    /**
-     * Creates a test controller instance with overridden redirect behavior
-     * @template T of \Core\Http\Controllers\Controller
-     * @param class-string<T> $controllerName
-     * @return \Core\Http\Controllers\Controller
-     */
-    private function getControllerInstance(string $controllerName)
-    {
-        // Generate a unique class name by appending a random hash to avoid naming conflicts
-        // when creating multiple test controller instances in the same test run
-        $className = 'TestController' . md5(uniqid('', true));
-
-        $code = "
-            class {$className} extends {$controllerName} {
-                protected function redirectTo(string \$location): void {
-                    echo 'Location: ' . \$location;
-                }
-            }
-        ";
-
-        eval($code);
-
-        return new $className();
     }
 }

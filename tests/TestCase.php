@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Core\Constants\Constants;
 use Core\Database\Database;
 use PHPUnit\Framework\TestCase as FrameworkTestCase;
 
